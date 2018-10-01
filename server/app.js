@@ -1,10 +1,20 @@
 
-// https://expressjs.com/en/starter/hello-world.html
-
-const express = require('express');
+const express = require("express");
 const app = express();
-const port = 3000;
+const server = require("http").createServer(app);
+const io = require("socket.io")(server);
+const path = require("path");
+const port = 80;
 
-app.get('/', (req, res) => res.send('Hello World!'));
+var sockets = {};
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.use("/", express.static(path.join(__dirname, "../client")));
+
+server.listen(port, () => {
+	console.log(`Started WOTA server, listening on port ${port}.`);
+});
+
+io.on("connection", (socket) => {
+	sockets[socket.id] = socket;
+	console.log(`A user connected, ${socket.id}.`);
+});
