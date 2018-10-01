@@ -1,0 +1,19 @@
+{
+  "name": "wota_server",
+  "version": "0.0.1",
+  "description": "Wars of the Ancients game for the web, maybe",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tisajokt/WOTA.git"
+  },
+  "author": "Timothy Walker",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tisajokt/WOTA/issues"
+  },
+  "homepage": "https://github.com/tisajokt/WOTA#readme"
+}

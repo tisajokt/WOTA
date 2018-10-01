@@ -1,1 +1,0 @@
-To launch server, run app.js using node.
