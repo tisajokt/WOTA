@@ -14,8 +14,11 @@ const listeners = {};
 const usersById = {};
 const usersByKey = {};
 
+var nextSocketId2 = 0;
+
 // This env object is passed to other scripts
 const env = {
+	io: io,
 	config: config,
 	sockets: sockets,
 	usersById: usersById,
@@ -38,7 +41,14 @@ server.listen(config.port, () => {
 
 function onSocketConnection(socket) {
 	sockets[socket.id] = socket;
-	console.log(`Socket ${socket.id} connected.`);
+	socket.id2 = nextSocketId2++;
+	Object.defineProperty(socket, "fullId", {
+		get: function getFullId() {
+			return this.id.substring(0, 4) + ":s" + this.id2 + ":u" + (this.user ? this.user.id : "?");
+		}
+	});
+	
+	console.log(`Socket ${socket.fullId} connected.`);
 	
 	// When a socket connects, it's set to listen to all events as defined in /server/listeners.
 	// Their first argument (socket) is bound to the socket variable.
@@ -48,6 +58,7 @@ function onSocketConnection(socket) {
 	
 	// Request that the client send over its userKey, if it has one saved
 	socket.emit("userKey", "req");
+	env.joinListenerModule.join(socket, "none");
 };
 
 // onSocketConnection(socket) called whenever a new socket connects

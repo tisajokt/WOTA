@@ -1,7 +1,7 @@
 
 // Module exports a function, which takes the main app's env object as a parameter
 // It returns a socket listener function
-module.exports = function(env) {
+module.exports = function userKeyListenerModule(env) {
 	const uuidv4 = require('uuid/v4');
 	var nextId = 0;
 
@@ -41,7 +41,7 @@ module.exports = function(env) {
 		this.sockets.push(socket);
 		socket.user = this;
 		
-		console.log(`Socket ${socket.id} identified with user #${this.id}.`);
+		console.log(`Socket ${socket.fullId} identified with user.`);
 		
 		var user = this;
 		socket.on("disconnect", () => {
@@ -61,7 +61,7 @@ module.exports = function(env) {
 		// If socket is identified with a user already, report and ignore
 		// Possibly malicious
 		if (socket.user) {
-			console.log(`Socket ${socket.id} sent ${data} in 'userKey' event when already identified with a user.`);
+			console.log(`Socket ${socket.fullId} sent ${data} in 'userKey' event when already identified with a user.`);
 			return;
 		}
 		
@@ -72,7 +72,7 @@ module.exports = function(env) {
 			// If socket is sending over its supposed userKey but has already been explicitly assigned one from server, report and ignore
 			// Possibly malicious
 			if (data != "req" && ++socket.attempts > 1) {
-				console.log(`Socket ${socket.id} sent incorrect key ${data} in 'userKey' event when already assigned a user.`);
+				console.log(`Socket ${socket.fullId} sent incorrect key ${data} in 'userKey' event when already assigned a user.`);
 				return;
 			}
 			
