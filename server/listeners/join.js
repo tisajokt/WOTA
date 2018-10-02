@@ -1,4 +1,6 @@
 
-module.exports = function(env, socket, data) {
-	
+module.exports = function(env) {
+	return function(socket, data) {
+		
+	};
 }

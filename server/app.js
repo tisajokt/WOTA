@@ -11,16 +11,21 @@ const fs = require("fs");
 const config = require("./config.json");
 const sockets = {};
 const listeners = {};
+const usersById = {};
+const usersByKey = {};
 
+// This env object is passed to other scripts
 const env = {
 	config: config,
-	sockets: sockets
+	sockets: sockets,
+	usersById: usersById,
+	usersByKey: usersByKey
 };
 
 // All files in /server/listeners are loaded as modules into the listeners object.
-// Their first argument (env) is bound to the env variable in app.js.
+// These modules are functions that take env as a parameter, and return a listener function.
 fs.readdirSync("./listeners/").forEach((event) => {
-	listeners[event.split(".")[0]] = require("./listeners/" + event).bind(null, env);
+	listeners[event.split(".")[0]] = require("./listeners/" + event)(env);
 });
 
 // All requests serve within the /client directory, ex. www.website.com/js/script1.js would serve /client/js/script1.js.
@@ -28,19 +33,22 @@ fs.readdirSync("./listeners/").forEach((event) => {
 app.use("/", express.static(path.join(__dirname, "../client")));
 
 server.listen(config.port, () => {
-	console.log(`Started WOTA server, listening on port ${port}.`);
+	console.log(`Started WOTA server, listening on port ${config.port}.`);
 });
 
 function onSocketConnection(socket) {
 	sockets[socket.id] = socket;
-	console.log(`A user connected, ${socket.id}.`);
+	console.log(`Socket ${socket.id} connected.`);
 	
 	// When a socket connects, it's set to listen to all events as defined in /server/listeners.
-	// Their second argument (socket) is bound to the socket variable.
-	// The second argument is bound instead of the first, because the first was already bound in loading listeners.
+	// Their first argument (socket) is bound to the socket variable.
 	for (let event in listeners) {
 		socket.on(event, listeners[event].bind(null, socket));
 	}
+	
+	// Request that the client send over its userKey, if it has one saved
+	socket.emit("userKey", "req");
 };
 
+// onSocketConnection(socket) called whenever a new socket connects
 io.on("connection", onSocketConnection);
