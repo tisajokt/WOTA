@@ -31,8 +31,10 @@ module.exports = function(env) {
 
 	// Identifies a socket with this user
 	User.prototype.connect = function userConnect(socket) {
-		if (this.killSelf)
+		if (this.killSelf != undefined) {
 			clearTimeout(this.killSelf);
+			delete this.killSelf;
+		}
 		
 		if (this.sockets.indexOf(socket) > -1)
 			return;
