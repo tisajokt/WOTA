@@ -7,7 +7,7 @@ module.exports = function(env) {
 
 	function getUserKey() {
 		let key;
-		// While a generated id is already being used, generate a new id
+		// While a generated key is already being used, generate a new key
 		while (env.usersByKey[key = uuidv4()]);
 		return key;
 	};
