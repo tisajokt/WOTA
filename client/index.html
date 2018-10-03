@@ -35,7 +35,6 @@
 			
 			function ready() {
 				console.log("Socket ready.");
-				socket.on("chat", postMessage);
 			};
 			
 			$("#messageForm").submit(() => {
@@ -51,6 +50,7 @@
 				return false;
 			});
 			
+			socket.on("chat", postMessage);
 			socket.on("userKey", (data) => {
 				// debug
 				// console.log(`Server sent ${data} in 'userKey' event.`);

@@ -61,6 +61,8 @@ module.exports = function joinListenerModule(env) {
 			socket.chatName = socket.user.account.name;
 		}
 		socket.chatColor = randomColorCode();
+		
+		socket.emit("chat", "Server", "#555555", `You have joined chat as ${socket.chatName}.`);
 	};
 	
 	// This function is exported to env, for use in the main app.

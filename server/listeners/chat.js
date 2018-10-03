@@ -2,6 +2,7 @@
 module.exports = function chatListenerModule(env) {
 	
 	return function chatListener(socket, message, target) {
+		message = message.replace(/<.+?>/g, "");
 		if (target) {
 			env.io.to(target).emit("chat", socket.chatName, socket.chatColor, message);
 		} else {
