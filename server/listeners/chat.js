@@ -1,6 +1,8 @@
 
 module.exports = function chatListenerModule(env) {
 	
+	// HTML encodes recommended for proper sanitization when inserting into HTML element content
+	// https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet
 	const htmlEncodes = {
 		"&": "&amp;",
 		"<": "&lt;",
