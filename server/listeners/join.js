@@ -6,6 +6,13 @@ module.exports = function joinListenerModule(env) {
 	const anonymizerAnimals = "Aardvark,Penguin,Elephant,Beaver,Bison,Bear,Moose,Leopard,Wolf,Dolphin,Badger,Whale,Owl,Goose,Bat,Rhino,Ferret,Orangutan,Zebra,Bobcat,Caribou,Cat,Seal,Crocodile,Alligator,Antelope,Robin,Lynx,Goldfish,Frog,Toad,Tortoise,Turtle,Iguana,Slug,Snail,Anteater,Panda,Giraffe,Gorilla,Shark,Flamingo,Rabbit,Heron,Hippo,Hummingbird,Hyena,Woodpecker,Jellyfish,Koala,Lizard,Lemur,Monkey,Ape,Snake,Manatee,Meerkat,Butterfly,Lion,Tiger,Cheetah,Newt,Salamander,Armadillo,Cardinal,Bluejay,Ocelot,Orca,Ostrich,Pigeon,Raven,Pig,Fox,Reindeer,Sponge,Tapir,Titmouse,Chicken,Cow,Horse,Human,Neandertal,Jackalope,Dragon,Elf,Dwarf".split(",");
 	const anonymizerAdjectives = "Ancient,Adorable,Adventurous,Adaptable,Ambitious,Awesome,Brave,Belligerent,Bizarre,Charming,Classy,Clever,Cultured,Curious,Dangerous,Delightful,Defiant,Determined,Eager,Educated,Efficient,Enchanting,Eager,Enthusiastic,Elegant,Fortunate,Fierce,Guiltless,Gifted,Glamorous,Gentle,Handsome,Helpful,Industrious,Important,Incredible,Infamous,Spanish Inquisitive,Intelligent,Kind,Lethal,Magnificent,Melodic,Mysterious,Nimble,Naughty,Proud,Powerful,Quaint,Rebellious,Resolute,Righteous,Secretive,Serious,Silent,Sincere,Successful,Superb,Swift,Steadfast,Thoughtful,Victorious".split(",");
 	
+	var nextHue = Math.random();
+	
+	// Golden ratio minus 1
+	// This should, in theory, keep the chat hues as far apart as possible... since the golden ratio is the most irrational number... that's how this works, right?
+	// Added to nextHue each time a color is generated
+	const hueIncrement = 0.6180339887;
+	
 	// Source: https://gist.github.com/mjackson/5311256
 	function hslToRgb(h, s, l) {
 		var r, g, b;
@@ -41,7 +48,8 @@ module.exports = function joinListenerModule(env) {
 			" " + anonymizerAnimals[Math.floor(Math.random() * anonymizerAnimals.length)];
 	};
 	function randomColorCode() {
-		var rgb = hslToRgb(Math.random(), 0.9, 0.4);
+		var rgb = hslToRgb(nextHue, 0.9, 0.4);
+		nextHue = (nextHue + hueIncrement) % 1;
 		return "#" + colorValueProcess(rgb[0]) + colorValueProcess(rgb[1]) + colorValueProcess(rgb[2]);
 	};
 	
@@ -62,7 +70,7 @@ module.exports = function joinListenerModule(env) {
 		}
 		socket.chatColor = randomColorCode();
 		
-		socket.emit("chat", "Server", "#555555", `You have joined chat as ${socket.chatName}.`);
+		socket.emit("chat", "Server", "#555", `You have joined chat as <span style="color:${socket.chatColor};">${socket.chatName}</span>.`);
 	};
 	
 	// This function is exported to env, for use in the main app.
