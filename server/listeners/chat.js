@@ -3,9 +3,9 @@ module.exports = function chatListenerModule(env) {
 	
 	return function chatListener(socket, message, target) {
 		if (target) {
-			io.to(target).emit("chat", socket.id, message);
+			env.io.to(target).emit("chat", socket.chatName, socket.chatColor, message);
 		} else {
-			socket.broadcast.to(socket.room).emit("chat", socket.id, message);
+			env.io.to(socket.room).emit("chat", socket.chatName, socket.chatColor, message);
 		}
 	};
 }
