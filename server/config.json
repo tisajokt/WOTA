@@ -1,3 +1,6 @@
 {
-	"port": 80
+	"port": 80,
+	"chatSpamIntervalSeconds": 4,
+	"chatSpamMessagesAllowedPerInterval": 4,
+	"chatSpamTimeout": 10
 }
