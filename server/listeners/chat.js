@@ -31,18 +31,16 @@ module.exports = function chatListenerModule(env) {
 	};
 	
 	function checkSpam(socket, message, target) {
-		if (message == "")
-			return true;
 		if (!socket.lastChats) {
 			socket.lastChats = [ Date.now() ];
 		} else if (socket.lastChats.length < env.config.chatSpamMessagesAllowedPerInterval) {
 			socket.lastChats.push(Date.now());
 		} else {
-			var earlyChat = socket.lastChat.splice(0, 1)[0];
+			var earlyChat = socket.lastChats.splice(0, 1)[0];
 			var now = Date.now();
 			socket.lastChats.push(now);
 			if (now - earlyChat < 1000 * env.config.chatSpamIntervalSeconds) {
-				socket.chatSpamTimeout = now + env.config.chatSpamTimeout;
+				socket.chatSpamTimeout = now + 1000 * env.config.chatSpamTimeout;
 				return true;
 			}
 		}
@@ -50,10 +48,14 @@ module.exports = function chatListenerModule(env) {
 	
 	return function chatListener(socket, message, target) {
 		var now = Date.now();
-		if (checkSpam(socket, message, target)) {
+		
+		if (message == "")
+			return;
+		
+		if (socket.chatSpamTimeout && socket.chatSpamTimeout - now > 0) {
+			sendMessage("Server", `Wait ${Math.ceil((socket.chatSpamTimeout - now) / 1000)} seconds to post again.`, socket.id, "#555");
+		} else if (checkSpam(socket, message, target)) {
 			sendMessage("Server", `You are sending messages too fast.`, socket.id, "#555");
-		} else if (socket.chatSpamTimeout && now - socket.chatSpamTimeout > 0) {
-			sendMessage("Server", `Wait ${Math.ceil(now - socket.chatSpamTimeout)} seconds to post again.`, socket.id, "#555");
 		} else {
 			sendMessage(socket.chatName, message, target || socket.room, socket.chatColor);
 		}
