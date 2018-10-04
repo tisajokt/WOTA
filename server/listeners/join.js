@@ -70,7 +70,7 @@ module.exports = function joinListenerModule(env) {
 		}
 		socket.chatColor = randomColorCode();
 		
-		socket.emit("chat", "Server", "#555", `You have joined chat as <span style="color:${socket.chatColor};">${socket.chatName}</span>.`);
+		env.sendMessage("Server", `You have joined chat as <span style="color:${socket.chatColor};">${socket.chatName}</span>.`, socket.id, "#555", false);
 	};
 	
 	// This function is exported to env, for use in the main app.
