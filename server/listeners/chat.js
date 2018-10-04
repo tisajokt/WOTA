@@ -25,12 +25,37 @@ module.exports = function chatListenerModule(env) {
 		return out;
 	};
 	
-	return function chatListener(socket, message, target) {
+	function sendMessage(name, message, target, color) {
 		message = sanitize(message, htmlEncodes);
-		if (target) {
-			env.io.to(target).emit("chat", socket.chatName, socket.chatColor, message);
+		env.io.to(target).emit("chat", name, color, message);
+	};
+	
+	function checkSpam(socket, message, target) {
+		if (message == "")
+			return true;
+		if (!socket.lastChats) {
+			socket.lastChats = [ Date.now() ];
+		} else if (socket.lastChats.length < env.config.chatSpamMessagesAllowedPerInterval) {
+			socket.lastChats.push(Date.now());
 		} else {
-			env.io.to(socket.room).emit("chat", socket.chatName, socket.chatColor, message);
+			var earlyChat = socket.lastChat.splice(0, 1)[0];
+			var now = Date.now();
+			socket.lastChats.push(now);
+			if (now - earlyChat < 1000 * env.config.chatSpamIntervalSeconds) {
+				socket.chatSpamTimeout = now + env.config.chatSpamTimeout;
+				return true;
+			}
+		}
+	};
+	
+	return function chatListener(socket, message, target) {
+		var now = Date.now();
+		if (checkSpam(socket, message, target)) {
+			sendMessage("Server", `You are sending messages too fast.`, socket.id, "#555");
+		} else if (socket.chatSpamTimeout && now - socket.chatSpamTimeout > 0) {
+			sendMessage("Server", `Wait ${Math.ceil(now - socket.chatSpamTimeout)} seconds to post again.`, socket.id, "#555");
+		} else {
+			sendMessage(socket.chatName, message, target || socket.room, socket.chatColor);
 		}
 	};
 }
