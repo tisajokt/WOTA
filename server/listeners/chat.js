@@ -15,7 +15,7 @@ module.exports = function chatListenerModule(env) {
 		"/": "&#x2F;",
 		"\\": "&#92;"
 	};
-	function sanitize(message, replacements) {
+	function charReplace(message, replacements) {
 		var out = "";
 		for (let i = 0; i < message.length; i++) {
 			let thisReplacement = replacements[message[i]];
@@ -30,7 +30,7 @@ module.exports = function chatListenerModule(env) {
 	
 	function sendMessage(name, message, target, color, sanitize=true) {
 		if (sanitize) {
-			message = sanitize(message, htmlEncodes);
+			message = charReplace(message, htmlEncodes);
 		}
 		env.io.to(target).emit("chat", name, color, message);
 	};
